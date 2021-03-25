@@ -54,9 +54,9 @@ button:hover {
 
 }
 
-#container {
+#body-container {
     margin: auto;
-    width: 23em;
+    width: 100%;
 }
 
 .correct {

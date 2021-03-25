@@ -2,10 +2,14 @@ var input = document.getElementById('guess'); // the input box
 var button = document.getElementById('button'); // the button
 var input_file = document.getElementById('inputfile'); // the input
 var begin_button = document.getElementById('beginbutton'); // the button
+var input_amount = document.getElementById('amount'); // the input amount
 
 var guess;
 var known = [];
 var cur_id = 1;
+var amount;
+var woordenlijst = [];
+var ready = false;
 
 // change css class
 var changeClass = function (cng, old, newClass) {
@@ -18,7 +22,10 @@ var gameloop = function () {
     for (var i = 1; i <= 5; i++) {
         var in_div_row = document.createElement("div");
         in_div_row.id = 'row' + i;
-        in_div_row.innerHTML = "<div class=\"square default\"></div><div class=\"square default\"></div><div class=\"square default\"></div><div class=\"square default\"></div><div class=\"square default\"></div>";
+        in_div_row.innerHTML = "";
+        for (var j = 0; j < amount; j++) {
+            in_div_row.innerHTML += "<div class=\"square default\"></div>";
+        }
         document.getElementById('container').appendChild(in_div_row);
     }
 
@@ -38,7 +45,7 @@ var gameloop = function () {
     var hasDuplicates = (/([a-zA-Z]).*?\1/).test(rand); // if multiple insances of a letter in the word
 
     var dup_dict = {};
-    for (var i = 0; i <= rand.length - 1; i++) {
+    for (var i = 0; i < rand.length; i++) {
         if (Object.keys(dup_dict).includes(rand[i])) {
             dup_dict[rand[i]] = dup_dict[rand[i]] + 1;
         } else {
@@ -60,7 +67,10 @@ var gameloop = function () {
     // give first letter
     document.getElementById("row1").firstElementChild.innerHTML = rand[0];
 
-    var guessed = [-1, -1, -1, -1, -1];
+    var guessed = [1];
+    for (var i = 1; i < amount; i++) {
+        guessed.push(-1);
+    }
 
     // guess event
     input.onkeypress = function (event) {
@@ -74,8 +84,8 @@ var gameloop = function () {
             var c = 0; // correct count
 
             // If not right number of letters
-            if (guess.length !== 5) {
-                document.getElementById('smallMsg').innerHTML = "Guesses must be 5 letters!";
+            if (guess.length !== parseInt(amount)) {
+                document.getElementById('smallMsg').innerHTML = "Guesses must be " + amount.toString() + " letters!";
                 // if (pressn === 5) {
                 //     end("Sorry, you lost.", "Correct word: " + rand);
                 // }
@@ -129,7 +139,7 @@ var gameloop = function () {
                 } //else if
             }
 
-            if (c === 5) { // if they have all the correct letters
+            if (c === parseInt(amount)) { // if they have all the correct letters
                 end("Correct!", "Next word?", pressn);
                 return;
             }
@@ -140,12 +150,15 @@ var gameloop = function () {
                 document.getElementById('smallMsg').innerHTML = "Out of tries, other team's turn";
                 var div_row = document.createElement("div");
                 div_row.id = 'row' + pressn;
-                div_row.innerHTML = "<div class=\"square default\"></div><div class=\"square default\"></div><div class=\"square default\"></div><div class=\"square default\"></div><div class=\"square default\"></div>";
+                div_row.innerHTML = "";
+                for (var j = 0; j < amount; j++) {
+                    div_row.innerHTML += "<div class=\"square default\"></div>";
+                }
                 document.getElementById('container').appendChild(div_row);
                 document.getElementById('row' + (pressn - 5)).remove();
             }
 
-            for (var i = 0; i < 5; i++) {
+            for (var i = 0; i < amount; i++) {
                 if (childDivs[i].className === "square correct") {
                     guessed[i] = 1;
                 }
@@ -190,13 +203,40 @@ var playagain = function () {
     gameloop();
 };
 
-function begin() {
-    changeClass(input_file, "visible", "invisible");
-    changeClass(begin_button, "visible", "invisible");
-    changeClass(input, "invisible", "visible");
-    known = [];
-    // start loop
-    gameloop();
+function load_content() {
+    const fr = new FileReader();
+    fr.onload = function () {
+        var word = '';
+        for (var res in fr.result) {
+            if (fr.result[res] !== '\n' && fr.result[res] !== '\r' && fr.result[res] !== ' ') {
+                word += fr.result[res];
+            }
+            if (word.length === parseInt(amount)) {
+                woordenlijst.push(word);
+                word = '';
+            }
+        }
+        ready = true;
+    };
+    fr.readAsText(word_file[0]);
 }
 
+function begin() {
+    amount = input_amount.value;
+
+    load_content();
+
+    var check_function = function () {
+        if (ready) {
+            changeClass(input_file, "visible", "invisible");
+            changeClass(begin_button, "visible", "invisible");
+            changeClass(input, "invisible", "visible");
+            changeClass(input_amount, "visible", "invisible");
+            known = [];
+            // start loop
+            gameloop();
+        }
+    };
+    setTimeout(check_function, 100);
+}
 

@@ -7,35 +7,23 @@
     <script src="//code.jquery.com/jquery-3.6.0.js"></script>
 </head>
 <body>
-<div id='msgBox'>Lingo</div>
-<div id="smallMsg">Guess the word</div>
-<div id="container"></div>
-<div style="text-align: center">
+<div>
+    <div id='msgBox'>Lingo</div>
+    <div id="smallMsg">Guess the word</div>
+    <div style="display: flex; justify-content: center">
+        <div id="container"></div>
+    </div>
     <input class="invisible" id="guess" onkeypress="submitguess(this)" placeholder='Type your guess!'>
     <button id="button" class="invisible" onClick="playagain()">Next word?</button>
-
-    <input type="file" name="inputfile" id="inputfile" class="visible">
+    <input class="visible" type="file" name="inputfile" id="inputfile" style="margin: auto">
+    <input class="visible" name="amount" id="amount" placeholder='Amount of letters' style="margin: auto;">
     <button id="beginbutton" class="visible" onClick="begin()">Start</button>
 </div>
 <script type="text/javascript">
-    var woordenlijst = [];
-    document.getElementById('inputfile')
-        .addEventListener('change', function () {
-            const fr = new FileReader();
-            fr.onload=function(){
-                var word = '';
-                for (var res in fr.result) {
-                    if (fr.result[res] !== '\n' && fr.result[res] !== '\r' && fr.result[res] !== '') {
-                        word += fr.result[res];
-                    }
-                    if (word.length === 5) {
-                        woordenlijst.push(word);
-                        word = '';
-                    }
-                }
-            };
-            fr.readAsText(this.files[0]);
-        });
+    var word_file;
+    document.getElementById('inputfile').onchange = function(event) {
+        word_file = this.files;
+    }
 </script>
 <script src="init.js"></script>
 <noscript>You need to enable JavaScript to view the full site.</noscript>
