@@ -95,7 +95,7 @@ var gameloop = function () {
             }
 
             // check for correctness
-            for (var i = 0; i < childDivs.length; i++) {
+            for (var i = 0; i < amount; i++) {
                 childDivs[i].innerHTML = guess[i];
 
                 // if letter match in right place
@@ -105,9 +105,15 @@ var gameloop = function () {
                 }
             }
 
+
+            if (c === parseInt(amount)) { // if they have all the correct letters
+                end("Correct!", "Next word?", pressn);
+                return;
+            }
+
             // check for wrong place
             var check_dup = {};
-            for (var i = 0; i < childDivs.length; i++) {
+            for (var i = 0; i < amount; i++) {
                 if (rand.indexOf(guess[i]) !== -1) {
                     if (!Object.keys(check_dup).includes(guess[i])) {
                         check_dup[guess[i]] = 1;
@@ -137,11 +143,6 @@ var gameloop = function () {
                         } //else if
                     }
                 } //else if
-            }
-
-            if (c === parseInt(amount)) { // if they have all the correct letters
-                end("Correct!", "Next word?", pressn);
-                return;
             }
 
             pressn++; // inc number of guesses
